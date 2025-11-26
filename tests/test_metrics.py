@@ -23,6 +23,7 @@ def test_metrics_from_readings_counts_outliers() -> None:
 
     assert metrics.count == 3
     assert metrics.outlier_ratio == 1 / 3
+    assert metrics.max_delta == 5.1
 
 
 def test_metrics_empty_batch_returns_zeroes() -> None:
@@ -30,3 +31,4 @@ def test_metrics_empty_batch_returns_zeroes() -> None:
 
     assert metrics.count == 0
     assert metrics.average_delta == 0.0
+    assert metrics.max_delta == 0.0
