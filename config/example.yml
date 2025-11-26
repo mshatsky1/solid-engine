@@ -1,0 +1,7 @@
+thresholds:
+  outlier: 4.5
+simulation:
+  seed: 123
+  jitter: 0.4
+CLI:
+  default_dataset: data/sample_readings.csv
