@@ -1,0 +1,24 @@
+[project]
+name = "solid-engine"
+version = "0.1.0"
+description = "Toy toolkit for simulating and reporting sensor reliability"
+readme = "README.md"
+authors = [{ name = "Solid Engine Maintainers" }]
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "click>=8.1",
+    "pandas>=2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+]
+
+[project.scripts]
+solid-engine = "solid_engine.cli:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
