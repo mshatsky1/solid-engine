@@ -19,6 +19,11 @@ dev = [
 [project.scripts]
 solid-engine = "solid_engine.cli:main"
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "-q"
+testpaths = ["tests"]
+
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
