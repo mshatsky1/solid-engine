@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Iterable
@@ -36,13 +37,28 @@ def main() -> None:
 
 @main.command()
 @click.option("--data", "data_path", type=click.Path(path_type=Path), default=DEFAULT_DATA_PATH)
-def report(data_path: Path) -> None:
+@click.option("--json/--text", "as_json", default=False, help="Return JSON instead of plain text.")
+def report(data_path: Path, as_json: bool) -> None:
     """Generate a text report from CSV input."""
 
     readings = list(_load_csv(data_path))
     batch = ReadingBatch.from_iterable(source=data_path.name, iterable=readings)
     builder = ReportBuilder()
-    click.echo(builder.format([batch]))
+    rows = builder.build([batch])
+    if as_json:
+        payload = [
+            {
+                "source": row.source,
+                "count": row.count,
+                "average_delta": row.average_delta,
+                "std_dev": row.std_dev,
+                "outlier_ratio": row.outlier_ratio,
+            }
+            for row in rows
+        ]
+        click.echo(json.dumps(payload, indent=2))
+    else:
+        click.echo(builder.format([batch]))
 
 
 @main.command()
