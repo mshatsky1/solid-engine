@@ -28,23 +28,33 @@ class ReliabilityMetrics:
     ) -> "ReliabilityMetrics":
         if outlier_threshold < 0:
             raise ValueError("outlier_threshold must be non-negative")
+        # Convert to list once for efficiency
         data = list(readings)
         if not data:
             return cls(count=0, average_delta=0.0, std_dev=0.0, outlier_ratio=0.0, max_delta=0.0)
 
-        deltas = [reading.delta for reading in data]
-        if not all(isinstance(d, (int, float)) for d in deltas):
-            raise TypeError("All deltas must be numeric")
+        # Single pass through data for better performance
+        deltas = []
+        outliers = 0
+        max_abs_delta = 0.0
+        for reading in data:
+            delta = reading.delta
+            deltas.append(delta)
+            abs_delta = abs(delta)
+            if abs_delta >= outlier_threshold:
+                outliers += 1
+            if abs_delta > max_abs_delta:
+                max_abs_delta = abs_delta
+
         avg = mean(deltas)
         spread = pstdev(deltas) if len(deltas) > 1 else 0.0
-        outliers = sum(1 for delta in deltas if abs(delta) >= outlier_threshold)
-        ratio = outliers / len(deltas)
+        ratio = outliers / len(deltas) if deltas else 0.0
         return cls(
             count=len(deltas),
             average_delta=avg,
             std_dev=spread,
             outlier_ratio=ratio,
-            max_delta=max(deltas, key=abs),
+            max_delta=max_abs_delta if deltas else 0.0,
         )
 
     def to_dict(self) -> dict[str, int | float]:
