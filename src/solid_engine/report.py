@@ -43,3 +43,17 @@ class ReportBuilder:
     def format(self, batches: Iterable[ReadingBatch]) -> str:
         lines = [line.as_text() for line in self.build(batches)]
         return "\n".join(lines)
+
+    def export_to_dict(self, batches: Iterable[ReadingBatch]) -> list[dict]:
+        """Export report data as a list of dictionaries."""
+        rows = self.build(batches)
+        return [
+            {
+                "source": row.source,
+                "count": row.count,
+                "average_delta": row.average_delta,
+                "std_dev": row.std_dev,
+                "outlier_ratio": row.outlier_ratio,
+            }
+            for row in rows
+        ]
