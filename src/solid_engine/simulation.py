@@ -12,7 +12,17 @@ from .models import ReadingBatch, SensorReading
 
 @dataclass
 class ScenarioSimulator:
-    """Very small simulation that perturbs expected values."""
+    """
+    Very small simulation that perturbs expected values.
+    
+    This simulator generates synthetic sensor readings by adding noise
+    to expected values. Supports both uniform and Gaussian noise distributions.
+    
+    Attributes:
+        seed: Random seed for reproducibility
+        jitter: Magnitude of noise to add (for uniform) or standard deviation (for Gaussian)
+        noise_type: Type of noise distribution ("uniform" or "gaussian")
+    """
 
     seed: int = 42
     jitter: float = 0.5
@@ -26,6 +36,18 @@ class ScenarioSimulator:
         count: int = 10,
         spacing_seconds: int = 60,
     ) -> ReadingBatch:
+        """
+        Generate a batch of synthetic sensor readings.
+        
+        Args:
+            sensor_id: Identifier for the sensor
+            expected_value: Base value to perturb
+            count: Number of readings to generate
+            spacing_seconds: Time interval between readings
+            
+        Returns:
+            ReadingBatch containing the generated readings
+        """
         rng = Random(self.seed)
         readings: List[SensorReading] = []
         base_time = datetime.utcnow()
