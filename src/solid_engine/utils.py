@@ -32,3 +32,11 @@ def round_to_precision(value: float, precision: int = 2) -> float:
 def format_timestamp(dt: datetime, format_str: str = "%Y-%m-%d %H:%M:%S") -> str:
     """Format a datetime object as a string."""
     return dt.strftime(format_str)
+
+
+def show_progress(current: int, total: int, prefix: str = "Progress") -> None:
+    """Display a simple progress indicator."""
+    if total == 0:
+        return
+    percentage = (current / total) * 100
+    logger.info(f"{prefix}: {current}/{total} ({percentage:.1f}%)")
