@@ -18,5 +18,13 @@ pip install -e .
 solid-engine --help
 ```
 
+## Features
+- Generate reliability reports from CSV data
+- Simulate sensor readings with configurable noise
+- Calculate metrics including outlier detection
+- Export reports in JSON or text format
+- Verbose output mode for debugging
+- Comprehensive validation and error handling
+
 ## Status
 Early experiment. Expect frequent, small commits.
