@@ -31,6 +31,17 @@ class SensorReading:
 
         return self.value - self.expected
 
+    @property
+    def relative_error(self) -> float:
+        """Relative error as a percentage of expected value."""
+        if self.expected == 0:
+            return 0.0
+        return (self.delta / self.expected) * 100.0
+
+    def is_outlier(self, threshold: float = 5.0) -> bool:
+        """Check if reading is an outlier based on absolute delta threshold."""
+        return abs(self.delta) >= threshold
+
 
 @dataclass(frozen=True)
 class ReadingBatch:
