@@ -47,10 +47,15 @@ def main() -> None:
 @main.command()
 @click.option("--data", "data_path", type=click.Path(path_type=Path), default=DEFAULT_DATA_PATH)
 @click.option("--json/--text", "as_json", default=False, help="Return JSON instead of plain text.")
-def report(data_path: Path, as_json: bool) -> None:
+@click.option("--verbose", "-v", is_flag=True, help="Enable verbose output with additional details.")
+def report(data_path: Path, as_json: bool, verbose: bool) -> None:
     """Generate a text report from CSV input."""
 
+    if verbose:
+        click.echo(f"Loading data from: {data_path}", err=True)
     readings = list(_load_csv(data_path))
+    if verbose:
+        click.echo(f"Loaded {len(readings)} readings", err=True)
     batch = ReadingBatch.from_iterable(source=data_path.name, iterable=readings)
     builder = ReportBuilder()
     rows = builder.build([batch])
