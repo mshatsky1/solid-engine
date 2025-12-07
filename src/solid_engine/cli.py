@@ -10,7 +10,7 @@ from typing import Iterable
 
 import click
 
-from .filters import filter_by_sensor_id, filter_outliers
+from .filters import filter_by_sensor_id, filter_by_time_range, filter_outliers
 from .metrics import ReliabilityMetrics
 from .models import ReadingBatch, SensorReading
 from .report import ReportBuilder
@@ -94,14 +94,29 @@ def simulate(sensor: str, expected: float, count: int, seed: int) -> None:
 @click.option("--data", "data_path", type=click.Path(path_type=Path), default=DEFAULT_DATA_PATH)
 @click.option("--sensor-id", help="Filter by sensor ID")
 @click.option("--remove-outliers", type=float, help="Remove outliers above threshold")
+@click.option("--start-time", help="Start time (ISO format)")
+@click.option("--end-time", help="End time (ISO format)")
 @click.option("--output", type=click.Path(path_type=Path), help="Output file path")
-def filter_data(data_path: Path, sensor_id: str | None, remove_outliers: float | None, output: Path | None) -> None:
+def filter_data(
+    data_path: Path,
+    sensor_id: str | None,
+    remove_outliers: float | None,
+    start_time: str | None,
+    end_time: str | None,
+    output: Path | None,
+) -> None:
     """Filter sensor readings by various criteria."""
     readings = list(_load_csv(data_path))
     
     if sensor_id:
         readings = filter_by_sensor_id(readings, sensor_id)
         click.echo(f"Filtered to sensor {sensor_id}: {len(readings)} readings", err=True)
+    
+    if start_time or end_time:
+        start = datetime.fromisoformat(start_time) if start_time else None
+        end = datetime.fromisoformat(end_time) if end_time else None
+        readings = filter_by_time_range(readings, start_time=start, end_time=end)
+        click.echo(f"Filtered by time range: {len(readings)} readings", err=True)
     
     if remove_outliers is not None:
         before = len(readings)
