@@ -35,6 +35,8 @@ class ScenarioSimulator:
         *,
         count: int = 10,
         spacing_seconds: int = 60,
+        start_time: datetime | None = None,
+        drift_rate: float = 0.0,
     ) -> ReadingBatch:
         """
         Generate a batch of synthetic sensor readings.
@@ -44,19 +46,22 @@ class ScenarioSimulator:
             expected_value: Base value to perturb
             count: Number of readings to generate
             spacing_seconds: Time interval between readings
+            start_time: Starting time for readings (defaults to now)
+            drift_rate: Linear drift per reading (defaults to 0.0)
             
         Returns:
             ReadingBatch containing the generated readings
         """
         rng = Random(self.seed)
         readings: List[SensorReading] = []
-        base_time = datetime.utcnow()
+        base_time = start_time if start_time is not None else datetime.utcnow()
         for index in range(count):
             if self.noise_type == "gaussian":
                 delta = rng.gauss(0, self.jitter / 2)
             else:  # uniform
                 delta = rng.uniform(-self.jitter, self.jitter)
-            value = expected_value + delta
+            drift = drift_rate * index
+            value = expected_value + delta + drift
             readings.append(
                 SensorReading(
                     sensor_id=sensor_id,
