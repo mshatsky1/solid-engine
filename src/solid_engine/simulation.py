@@ -16,6 +16,7 @@ class ScenarioSimulator:
 
     seed: int = 42
     jitter: float = 0.5
+    noise_type: str = "uniform"  # "uniform" or "gaussian"
 
     def generate(
         self,
@@ -29,7 +30,10 @@ class ScenarioSimulator:
         readings: List[SensorReading] = []
         base_time = datetime.utcnow()
         for index in range(count):
-            delta = rng.uniform(-self.jitter, self.jitter)
+            if self.noise_type == "gaussian":
+                delta = rng.gauss(0, self.jitter / 2)
+            else:  # uniform
+                delta = rng.uniform(-self.jitter, self.jitter)
             value = expected_value + delta
             readings.append(
                 SensorReading(
