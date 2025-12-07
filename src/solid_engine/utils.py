@@ -26,3 +26,9 @@ def normalize(value: float, min_val: float, max_val: float) -> float:
 def round_to_precision(value: float, precision: int = 2) -> float:
     """Round a float to specified decimal places."""
     return round(value, precision)
+
+
+def format_timestamp(dt: datetime, format_str: str = "%Y-%m-%d %H:%M:%S") -> str:
+    """Format a datetime object as a string."""
+    from datetime import datetime
+    return dt.strftime(format_str)
