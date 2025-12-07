@@ -66,3 +66,13 @@ class ReliabilityMetrics:
             "outlier_ratio": round(self.outlier_ratio, 4),
             "max_delta": round(self.max_delta, 4),
         }
+
+    def summary(self) -> str:
+        """Generate a human-readable summary of metrics."""
+        return (
+            f"Count: {self.count}, "
+            f"Avg Delta: {self.average_delta:.4f}, "
+            f"Std Dev: {self.std_dev:.4f}, "
+            f"Outliers: {self.outlier_ratio:.2%}, "
+            f"Max Delta: {self.max_delta:.4f}"
+        )
