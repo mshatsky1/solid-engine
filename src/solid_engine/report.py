@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Iterable
 
 from .metrics import ReliabilityMetrics
@@ -57,3 +59,23 @@ class ReportBuilder:
             }
             for row in rows
         ]
+
+    def export_to_csv(self, batches: Iterable[ReadingBatch], output_path: Path) -> None:
+        """Export report data to CSV file."""
+        rows = self.build(batches)
+        with output_path.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(
+                f,
+                fieldnames=["source", "count", "average_delta", "std_dev", "outlier_ratio"],
+            )
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(
+                    {
+                        "source": row.source,
+                        "count": row.count,
+                        "average_delta": f"{row.average_delta:.4f}",
+                        "std_dev": f"{row.std_dev:.4f}",
+                        "outlier_ratio": f"{row.outlier_ratio:.4f}",
+                    }
+                )
