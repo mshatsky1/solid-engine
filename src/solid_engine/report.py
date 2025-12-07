@@ -42,9 +42,44 @@ class ReportBuilder:
             )
         return output
 
-    def format(self, batches: Iterable[ReadingBatch]) -> str:
-        lines = [line.as_text() for line in self.build(batches)]
-        return "\n".join(lines)
+    def format(self, batches: Iterable[ReadingBatch], style: str = "table") -> str:
+        """Format report with different styles."""
+        lines = self.build(batches)
+        if style == "table":
+            return self._format_table(lines)
+        elif style == "compact":
+            return self._format_compact(lines)
+        elif style == "detailed":
+            return self._format_detailed(lines)
+        else:
+            return "\n".join(line.as_text() for line in lines)
+
+    def _format_table(self, lines: list[ReportLine]) -> str:
+        """Format as a table with headers."""
+        header = f"{'Source':>12} | {'Count':>5} | {'Avg Delta':>10} | {'Std Dev':>8} | {'Outliers':>8}"
+        separator = "-" * len(header)
+        rows = [header, separator] + [line.as_text() for line in lines]
+        return "\n".join(rows)
+
+    def _format_compact(self, lines: list[ReportLine]) -> str:
+        """Format as compact single-line entries."""
+        return "\n".join(
+            f"{line.source}: {line.count} readings, "
+            f"avg={line.average_delta:+.3f}, outliers={line.outlier_ratio:.1%}"
+            for line in lines
+        )
+
+    def _format_detailed(self, lines: list[ReportLine]) -> str:
+        """Format with detailed information."""
+        result = []
+        for line in lines:
+            result.append(f"Source: {line.source}")
+            result.append(f"  Count: {line.count}")
+            result.append(f"  Average Delta: {line.average_delta:+.6f}")
+            result.append(f"  Standard Deviation: {line.std_dev:.6f}")
+            result.append(f"  Outlier Ratio: {line.outlier_ratio:.2%}")
+            result.append("")
+        return "\n".join(result)
 
     def export_to_dict(self, batches: Iterable[ReadingBatch]) -> list[dict[str, str | int | float]]:
         """Export report data as a list of dictionaries."""
