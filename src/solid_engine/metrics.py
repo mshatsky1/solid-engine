@@ -26,11 +26,15 @@ class ReliabilityMetrics:
         *,
         outlier_threshold: float = 5.0,
     ) -> "ReliabilityMetrics":
+        if outlier_threshold < 0:
+            raise ValueError("outlier_threshold must be non-negative")
         data = list(readings)
         if not data:
             return cls(count=0, average_delta=0.0, std_dev=0.0, outlier_ratio=0.0, max_delta=0.0)
 
         deltas = [reading.delta for reading in data]
+        if not all(isinstance(d, (int, float)) for d in deltas):
+            raise TypeError("All deltas must be numeric")
         avg = mean(deltas)
         spread = pstdev(deltas) if len(deltas) > 1 else 0.0
         outliers = sum(1 for delta in deltas if abs(delta) >= outlier_threshold)
