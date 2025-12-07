@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 
 # Configure module-level logger
 logger = logging.getLogger(__name__)
@@ -30,5 +31,4 @@ def round_to_precision(value: float, precision: int = 2) -> float:
 
 def format_timestamp(dt: datetime, format_str: str = "%Y-%m-%d %H:%M:%S") -> str:
     """Format a datetime object as a string."""
-    from datetime import datetime
     return dt.strftime(format_str)
