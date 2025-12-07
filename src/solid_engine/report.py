@@ -44,7 +44,7 @@ class ReportBuilder:
         lines = [line.as_text() for line in self.build(batches)]
         return "\n".join(lines)
 
-    def export_to_dict(self, batches: Iterable[ReadingBatch]) -> list[dict]:
+    def export_to_dict(self, batches: Iterable[ReadingBatch]) -> list[dict[str, str | int | float]]:
         """Export report data as a list of dictionaries."""
         rows = self.build(batches)
         return [

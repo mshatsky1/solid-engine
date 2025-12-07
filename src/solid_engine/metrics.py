@@ -47,7 +47,8 @@ class ReliabilityMetrics:
             max_delta=max(deltas, key=abs),
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, int | float]:
+        """Convert metrics to dictionary format."""
         return {
             "count": self.count,
             "average_delta": round(self.average_delta, 4),
