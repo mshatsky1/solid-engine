@@ -16,6 +16,15 @@ class SensorReading:
     value: float
     expected: float
 
+    def __post_init__(self) -> None:
+        """Validate reading data after initialization."""
+        if not self.sensor_id:
+            raise ValueError("sensor_id cannot be empty")
+        if not isinstance(self.value, (int, float)):
+            raise TypeError("value must be numeric")
+        if not isinstance(self.expected, (int, float)):
+            raise TypeError("expected must be numeric")
+
     @property
     def delta(self) -> float:
         """Difference between measurement and expected value."""
