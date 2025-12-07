@@ -19,15 +19,24 @@ DEFAULT_DATA_PATH = Path("data/sample_readings.csv")
 
 
 def _load_csv(path: Path) -> Iterable[SensorReading]:
-    with path.open("r", encoding="utf-8") as handle:
-        reader = csv.DictReader(handle)
-        for row in reader:
-            yield SensorReading(
-                sensor_id=row["sensor_id"],
-                recorded_at=datetime.fromisoformat(row["recorded_at"]),
-                value=float(row["value"]),
-                expected=float(row["expected"]),
-            )
+    """Load sensor readings from CSV file with error handling."""
+    if not path.exists():
+        raise FileNotFoundError(f"Data file not found: {path}")
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row_num, row in enumerate(reader, start=2):  # Start at 2 (header is row 1)
+                try:
+                    yield SensorReading(
+                        sensor_id=row["sensor_id"],
+                        recorded_at=datetime.fromisoformat(row["recorded_at"]),
+                        value=float(row["value"]),
+                        expected=float(row["expected"]),
+                    )
+                except (KeyError, ValueError, TypeError) as e:
+                    raise ValueError(f"Invalid data at row {row_num}: {e}") from e
+    except IOError as e:
+        raise IOError(f"Failed to read file {path}: {e}") from e
 
 
 @click.group()
