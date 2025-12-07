@@ -10,6 +10,7 @@ from typing import Iterable
 
 import click
 
+from .filters import filter_by_sensor_id, filter_outliers
 from .metrics import ReliabilityMetrics
 from .models import ReadingBatch, SensorReading
 from .report import ReportBuilder
@@ -87,6 +88,36 @@ def simulate(sensor: str, expected: float, count: int, seed: int) -> None:
     batch = simulator.generate(sensor_id=sensor, expected_value=expected, count=count)
     metrics = ReliabilityMetrics.from_readings(batch.readings)
     click.echo(metrics.to_dict())
+
+
+@main.command()
+@click.option("--data", "data_path", type=click.Path(path_type=Path), default=DEFAULT_DATA_PATH)
+@click.option("--sensor-id", help="Filter by sensor ID")
+@click.option("--remove-outliers", type=float, help="Remove outliers above threshold")
+@click.option("--output", type=click.Path(path_type=Path), help="Output file path")
+def filter_data(data_path: Path, sensor_id: str | None, remove_outliers: float | None, output: Path | None) -> None:
+    """Filter sensor readings by various criteria."""
+    readings = list(_load_csv(data_path))
+    
+    if sensor_id:
+        readings = filter_by_sensor_id(readings, sensor_id)
+        click.echo(f"Filtered to sensor {sensor_id}: {len(readings)} readings", err=True)
+    
+    if remove_outliers is not None:
+        before = len(readings)
+        readings = filter_outliers(readings, threshold=remove_outliers)
+        after = len(readings)
+        click.echo(f"Removed {before - after} outliers", err=True)
+    
+    if output:
+        batch = ReadingBatch.from_iterable(source=data_path.name, iterable=readings)
+        builder = ReportBuilder()
+        builder.export_to_csv([batch], output)
+        click.echo(f"Exported {len(readings)} readings to {output}")
+    else:
+        batch = ReadingBatch.from_iterable(source=data_path.name, iterable=readings)
+        builder = ReportBuilder()
+        click.echo(builder.format([batch]))
 
 
 if __name__ == "__main__":
